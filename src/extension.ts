@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import Range from 'vscode';
+import { Range } from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.info("ScopeFocus loaded");

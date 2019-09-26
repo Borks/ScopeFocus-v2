@@ -3,6 +3,12 @@
 	"displayName": "ScopeFocus",
 	"description": "Focus only on a part of your code",
 	"version": "0.0.1",
+	"publisher": "BorkaCodes",
+	"icon": "logo.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Borks/ScopeFocus-v2"
+	},
 	"engines": {
 		"vscode": "^1.38.0"
 	},
