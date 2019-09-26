@@ -10,15 +10,20 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.focus"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [{
-			"command": "extension.helloWorld",
-			"title": "Hello World"
-		}]
-	},
+		"commands": [
+		{
+			"command": "extension.focus",
+			"title": "ScopeFocus: Activate"
+		},
+		{
+			"command": "extension.defocus",
+			"title": "ScopeFocus: Deactivate"
+		}
+	]},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
 		"compile": "tsc -p ./",
