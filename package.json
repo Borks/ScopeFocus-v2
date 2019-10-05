@@ -28,8 +28,21 @@
 			{
 				"command": "extension.defocus",
 				"title": "ScopeFocus: Deactivate"
+			},
+			{
+				"command": "extension.focusSelection",
+				"title": "Focus this",
+				"when": "editorHasSelection"
 			}
 		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "extension.focusSelection"
+				}
+			]
+		},
 		"configuration": {
 			"title": "ScopeFocus",
 			"properties": {

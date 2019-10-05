@@ -4,7 +4,6 @@ import {
 	Range,
 	TextEditor,
 	TextEditorDecorationType,
-	ThemeColor,
 	commands,
 	window
 } from 'vscode';
@@ -33,6 +32,10 @@ export function activate(context: ExtensionContext) {
 		resetDecorations();
 	});
 
+	let focusSelection = commands.registerCommand('extension.focusSelection' , () => {
+		console.log("Focusing on selection");
+	});
+
 
 
 	if (window.activeTextEditor) {
@@ -46,8 +49,13 @@ export function activate(context: ExtensionContext) {
 		context.subscriptions.push(changeWatcher);
 	}
 
+	context.subscriptions.push(focusSelection);
 	context.subscriptions.push(activateCommand);
 	context.subscriptions.push(deactivateCommand);
+}
+
+function focusSelection() {
+	console.log("Yes");
 }
 
 /**
