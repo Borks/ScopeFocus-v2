@@ -10,8 +10,7 @@ import {
 } from 'vscode';
 
 const OUT_OF_FOCUS_DECORATION = {
-	'backgroundColor': new ThemeColor('foreground'),
-	'color': new ThemeColor('editor.background'),
+	'opacity': '0.1',
 };
 
 var activeDecorations: TextEditorDecorationType[] = [];
@@ -57,7 +56,7 @@ function focusOnRange(editor: TextEditor | undefined) {
 		// Get range of new focus area (Currently active line )
 		let activeLine = editor.selection.anchor.line + 1;
 		let startRange: Range = new Range(new Position(0,0), new Position(activeLine - 1, 0));
-		let endRange: Range = new Range(new Position(activeLine + 1,0), new Position(600, 0));
+		let endRange: Range = new Range(new Position(activeLine, 0), new Position(editor.document.lineCount, 0));
 
 		// Create and enable decoration
 		var outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
