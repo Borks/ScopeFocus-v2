@@ -29,7 +29,24 @@
 				"command": "extension.defocus",
 				"title": "ScopeFocus: Deactivate"
 			}
-		]
+		],
+		"configuration": {
+			"title": "ScopeFocus",
+			"properties": {
+				"scopefocus.focusType": {
+					"type": "string",
+					"description": "What type of focus should be used.",
+					"default": "Line",
+					"enum": ["Line", "Scope"]
+				},
+				"scopefocus.linePadding": {
+					"type": "number",
+					"description": "How many extra lines should be in focus for line mode.",
+					"default": 0,
+					"minimum": 0
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
