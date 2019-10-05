@@ -5,7 +5,8 @@ import {
 	TextEditor,
 	TextEditorDecorationType,
 	commands,
-	window
+	window,
+	workspace
 } from 'vscode';
 
 const OUT_OF_FOCUS_DECORATION = {
@@ -23,6 +24,9 @@ function resetDecorations() {
 export function activate(context: ExtensionContext) {
 	console.info("ScopeFocus loaded");
 
+	let configuration = workspace.getConfiguration('scopefocus');
+	console.log(configuration);
+
 	let activateCommand = commands.registerCommand('extension.focus', () => {
 		console.info('Focusing');
 	});
@@ -32,7 +36,7 @@ export function activate(context: ExtensionContext) {
 		resetDecorations();
 	});
 
-	let focusSelection = commands.registerCommand('extension.focusSelection' , () => {
+	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
 		console.log("Focusing on selection");
 	});
 
@@ -49,13 +53,9 @@ export function activate(context: ExtensionContext) {
 		context.subscriptions.push(changeWatcher);
 	}
 
-	context.subscriptions.push(focusSelection);
+	context.subscriptions.push(focusSelectionCommand);
 	context.subscriptions.push(activateCommand);
 	context.subscriptions.push(deactivateCommand);
-}
-
-function focusSelection() {
-	console.log("Yes");
 }
 
 /**

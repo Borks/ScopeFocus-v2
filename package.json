@@ -57,6 +57,13 @@
 					"description": "How many extra lines should be in focus for line mode.",
 					"default": 0,
 					"minimum": 0
+				},
+				"scopefocus.opacity": {
+					"type": "number",
+					"description": "Opacity for out of focus lines.",
+					"default": 0.1,
+					"minimum": 0,
+					"maximum": 1
 				}
 			}
 		}
