@@ -3,9 +3,18 @@ import {
 	Position,
 	Range,
 	TextEditor,
+	TextEditorDecorationType,
+	ThemeColor,
 	commands,
 	window
 } from 'vscode';
+
+const OUT_OF_FOCUS_DECORATION = {
+	'backgroundColor': new ThemeColor('foreground'),
+	'color': new ThemeColor('editor.background'),
+};
+
+var activeDecorations: TextEditorDecorationType[] = [];
 
 export function activate(context: ExtensionContext) {
 	console.info("ScopeFocus loaded");
@@ -39,12 +48,24 @@ function focusOnRange(editor: TextEditor | undefined) {
 
 	// If ---
 	if (editor) {
-		let activeLine = editor.selection.anchor.line;
+
+		// Disable old decorations
+		for (const decoration of activeDecorations) {
+			decoration.dispose();
+		}
+
+		// Get range of new focus area (Currently active line )
+		let activeLine = editor.selection.anchor.line + 1;
 		let startRange: Range = new Range(new Position(0,0), new Position(activeLine - 1, 0));
 		let endRange: Range = new Range(new Position(activeLine + 1,0), new Position(600, 0));
 
-		console.log(startRange, endRange);
+		// Create and enable decoration
+		var outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
+
+		activeDecorations.push(outOfFocus);
+		editor.setDecorations(outOfFocus, [startRange, endRange]);
 	}
+
 }
 
 export function deactivate() {}
