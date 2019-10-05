@@ -15,6 +15,12 @@ const OUT_OF_FOCUS_DECORATION = {
 
 var activeDecorations: TextEditorDecorationType[] = [];
 
+function resetDecorations() {
+	for (const decoration of activeDecorations) {
+		decoration.dispose();
+	}
+}
+
 export function activate(context: ExtensionContext) {
 	console.info("ScopeFocus loaded");
 
@@ -24,9 +30,15 @@ export function activate(context: ExtensionContext) {
 
 	let deactivateCommand = commands.registerCommand('extension.defocus', () => {
 		console.info('Defocusing');
+		resetDecorations();
 	});
 
+
+
 	if (window.activeTextEditor) {
+
+		focusOnRange(window.activeTextEditor);
+
 		let changeWatcher = window.onDidChangeTextEditorSelection( () => {
 			focusOnRange(window.activeTextEditor);
 		});
@@ -44,14 +56,9 @@ export function activate(context: ExtensionContext) {
  * @param {Range} range Range in active editor to focus on
  */
 function focusOnRange(editor: TextEditor | undefined) {
-
-	// If ---
 	if (editor) {
 
-		// Disable old decorations
-		for (const decoration of activeDecorations) {
-			decoration.dispose();
-		}
+		resetDecorations();
 
 		// Get range of new focus area (Currently active line )
 		let activeLine = editor.selection.anchor.line + 1;
@@ -67,5 +74,7 @@ function focusOnRange(editor: TextEditor | undefined) {
 
 }
 
-export function deactivate() {}
+export function deactivate() {
+	resetDecorations();
+}
 
