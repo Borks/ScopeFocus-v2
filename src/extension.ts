@@ -9,23 +9,19 @@ import {
 	workspace
 } from 'vscode';
 
-const OUT_OF_FOCUS_DECORATION = {
-	'opacity': '0.1',
-};
+// Decorations to apply to out of focus ranges.
+const OUT_OF_FOCUS_DECORATION = { 'opacity': '0.1' };
 
-var activeDecorations: TextEditorDecorationType[] = [];
 
-function resetDecorations() {
-	for (const decoration of activeDecorations) {
-		decoration.dispose();
-	}
-}
+// Ranges that should be in focus
+const rangesInFocus: Object = {};
+
+// Ranges by URI that are out of focus
+const rangesOutOfFocus: Object = {};
+
 
 export function activate(context: ExtensionContext) {
 	console.info("ScopeFocus loaded");
-
-	let configuration = workspace.getConfiguration('scopefocus');
-	console.log(configuration);
 
 	let activateCommand = commands.registerCommand('extension.focus', () => {
 		console.info('Focusing');
@@ -37,48 +33,30 @@ export function activate(context: ExtensionContext) {
 	});
 
 	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
-		console.log("Focusing on selection");
+		console.info('Setting range into focus');
 	});
 
-
-
-	if (window.activeTextEditor) {
-
-		focusOnRange(window.activeTextEditor);
-
-		let changeWatcher = window.onDidChangeTextEditorSelection( () => {
-			focusOnRange(window.activeTextEditor);
-		});
-
-		context.subscriptions.push(changeWatcher);
-	}
+	let defocusSelectionCommand = commands.registerCommand('extension.defocusSelection' , () => {
+		console.info('Removing range from focus');
+	});
 
 	context.subscriptions.push(focusSelectionCommand);
+	context.subscriptions.push(defocusSelectionCommand);
 	context.subscriptions.push(activateCommand);
 	context.subscriptions.push(deactivateCommand);
 }
+
+
+function resetDecorations() {
+}
+
 
 /**
  * Apply focus for a specific range
  *
  * @param {Range} range Range in active editor to focus on
  */
-function focusOnRange(editor: TextEditor | undefined) {
-	if (editor) {
-
-		resetDecorations();
-
-		// Get range of new focus area (Currently active line )
-		let activeLine = editor.selection.anchor.line + 1;
-		let startRange: Range = new Range(new Position(0,0), new Position(activeLine - 1, 0));
-		let endRange: Range = new Range(new Position(activeLine, 0), new Position(editor.document.lineCount, 0));
-
-		// Create and enable decoration
-		var outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
-
-		activeDecorations.push(outOfFocus);
-		editor.setDecorations(outOfFocus, [startRange, endRange]);
-	}
+function focusOnRange(range: Range) {
 
 }
 
