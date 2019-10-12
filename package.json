@@ -33,6 +33,11 @@
 				"command": "extension.focusSelection",
 				"title": "Focus this",
 				"when": "editorHasSelection"
+			},
+			{
+				"command": "extension.defocusSelection",
+				"title": "Defocus this",
+				"when": "extension.isFocused && !editorHasSelection"
 			}
 		],
 		"menus": {
@@ -40,6 +45,10 @@
 				{
 					"when": "editorHasSelection",
 					"command": "extension.focusSelection"
+				},
+				{
+					"command": "extension.defocusSelection",
+					"when": "extension.isFocused && !editorHasSelection"
 				}
 			]
 		},
