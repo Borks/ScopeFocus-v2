@@ -112,6 +112,7 @@ function setDecorationRanges() : Range[] | boolean {
 
 	let document = window.activeTextEditor.document;
 	let offsets = getRangeOffsets();
+	console.log(offsets);
 
 	rangesOutOfFocus = [];
 
@@ -142,7 +143,7 @@ function setDecorationRanges() : Range[] | boolean {
 
 		rangesOutOfFocus.push(outOfFocusRange);
 	}
-
+	console.log(rangesOutOfFocus);
 	return rangesOutOfFocus;
 }
 
@@ -163,7 +164,7 @@ function getRangeOffsets(): number[] {
 		offsets.push(document.offsetAt(range.end));
 	});
 
-	offsets = offsets.sort();
+	offsets = offsets.sort((a,b) => {return a-b;});
 
 	return offsets;
 }

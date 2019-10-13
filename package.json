@@ -99,6 +99,11 @@
 				"mac": "ctrl+alt+f"
 			},
 			{
+				"command": "extension.defocusSelection",
+				"key": "ctrl+alt+x",
+				"mac": "ctrl+alt+x"
+			},
+			{
 				"command": "extension.defocusAll",
 				"key": "ctrl+alt+backspace",
 				"mac": "ctrl+alt+backspace"
