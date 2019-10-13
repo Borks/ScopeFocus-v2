@@ -112,7 +112,6 @@ function setDecorationRanges() : Range[] | boolean {
 
 	let document = window.activeTextEditor.document;
 	let offsets = getRangeOffsets();
-	console.log(offsets);
 
 	rangesOutOfFocus = [];
 
@@ -143,7 +142,7 @@ function setDecorationRanges() : Range[] | boolean {
 
 		rangesOutOfFocus.push(outOfFocusRange);
 	}
-	console.log(rangesOutOfFocus);
+
 	return rangesOutOfFocus;
 }
 
