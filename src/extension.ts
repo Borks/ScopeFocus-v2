@@ -49,7 +49,7 @@ export function activate(context: ExtensionContext) {
 
 
 	let deactivateCommand = commands.registerCommand('extension.defocus', () => {
-		resetDecorations(true);
+		resetDecorations();
 	});
 	context.subscriptions.push(deactivateCommand);
 

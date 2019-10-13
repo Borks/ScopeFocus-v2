@@ -80,7 +80,30 @@
 					"maximum": 1
 				}
 			}
-		}
+		},
+		"keybindings": [
+			{
+				"command": "extension.focus",
+				"key": "ctrl+alt+s",
+				"mac": "ctrl+alt+s"
+			},
+			{
+				"command": "extension.focusSelection",
+				"key": "ctrl+alt+d",
+				"mac": "ctrl+alt+d",
+				"when": "editorHasSelection"
+			},
+			{
+				"command": "extension.defocus",
+				"key": "ctrl+alt+f",
+				"mac": "ctrl+alt+f"
+			},
+			{
+				"command": "extension.defocusAll",
+				"key": "ctrl+alt+backspace",
+				"mac": "ctrl+alt+backspace"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
