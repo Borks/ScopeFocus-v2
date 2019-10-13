@@ -4,13 +4,14 @@ import {
 	Range,
 	TextEditorDecorationType,
 	commands,
-	window
+	window,
+	workspace
 } from 'vscode';
 
 /**
- *  Decorations to apply to out of focus ranges.
+ * Extension configuration
  */
-const OUT_OF_FOCUS_DECORATION = { 'opacity': '0.1' };
+const EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 
 
 /**
@@ -83,12 +84,15 @@ function setDecorationRanges() : Range[] | boolean {
 	if (!window.activeTextEditor) { return false; }
 
 	let document = window.activeTextEditor.document;
-	rangesOutOfFocus = [];
-
 	let offsets = getRangeOffsets();
 
-	let posA: Position = new Position(0, 0);
+	rangesOutOfFocus = [];
 
+	/**
+	 * Set the ranges between every other offset point.
+	 * Starting from the document beginning.
+	 */
+	let posA: Position = new Position(0, 0);
 	for (let index = 0; index < offsets.length; index = index + 2) {
 		let posB: Position = document.positionAt(offsets[index]);
 
@@ -100,6 +104,9 @@ function setDecorationRanges() : Range[] | boolean {
 		}
 	}
 
+	/**
+	 * Set the range from the last offset point to the end of the document
+	 */
 	if (offsets.length > 0) {
 		let outOfFocusRange: Range = new Range(
 			document.positionAt(offsets[offsets.length-1]),
@@ -113,6 +120,10 @@ function setDecorationRanges() : Range[] | boolean {
 }
 
 
+/**
+ * @function getRangeOffsets Convert the in focus ranges to offset numbers
+ * @returns {number[]} Array of numbers, symbolising offsets in editor, in sorted order.
+ */
 function getRangeOffsets(): number[] {
 	if (!window.activeTextEditor) { return []; }
 
@@ -191,6 +202,10 @@ function removeRangeFromFocus(range: Range): void {
  */
 function applyDecorations(): void | boolean {
 	if (!window.activeTextEditor) { return false; }
+	let OUT_OF_FOCUS_DECORATION = { 'opacity': '0.1' };
+
+	let opacity: string | undefined = EXTENSION_CONFIGURATION.get('opacity');
+	if (opacity) { OUT_OF_FOCUS_DECORATION = { 'opacity': opacity }; }
 
 	resetDecorations();
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);

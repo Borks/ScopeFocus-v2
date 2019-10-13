@@ -36,12 +36,12 @@
 			},
 			{
 				"command": "extension.defocusSelection",
-				"title": "Defocus Selection",
+				"title": "Unfocus Selection",
 				"when": "!editorHasSelection"
 			},
 			{
 				"command": "extension.defocusAll",
-				"title": "ScopeFocus: Defocus All"
+				"title": "ScopeFocus: Unfocus All"
 			}
 		],
 		"menus": {
