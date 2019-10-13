@@ -2,6 +2,7 @@ import {
 	ExtensionContext,
 	Position,
 	Range,
+	TextEditor,
 	TextEditorDecorationType,
 	commands,
 	window,
@@ -37,6 +38,9 @@ var activeDecorations: TextEditorDecorationType[] = [];
  */
 export function activate(context: ExtensionContext) {
 
+	/* -------------------------------------------------------------------------- */
+	/*                                  COMMANDS                                  */
+	/* -------------------------------------------------------------------------- */
 	let activateCommand = commands.registerCommand('extension.focus', () => {
 		setDecorationRanges();
 		applyDecorations();
@@ -75,11 +79,27 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(defocusAllCommand);
 
 
+	/* -------------------------------------------------------------------------- */
+	/*                                  WATCHERS                                  */
+	/* -------------------------------------------------------------------------- */
+
+	/**
+	 * Reload configuration if it changes
+	 */
 	let configurationWatcher = workspace.onDidChangeConfiguration(() => {
 		EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 		applyDecorations();
 	});
 	context.subscriptions.push(configurationWatcher);
+
+
+	/**
+	 * Reapply correct ranges if active editor changes
+	 */
+	let editorWatcher = window.onDidChangeActiveTextEditor((editor: TextEditor | undefined) => {
+
+	});
+	context.subscriptions.push(editorWatcher);
 }
 
 
