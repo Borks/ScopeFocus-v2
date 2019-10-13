@@ -2,6 +2,7 @@ import {
 	ExtensionContext,
 	Position,
 	Range,
+	TextEditor,
 	TextEditorDecorationType,
 	commands,
 	window
@@ -56,7 +57,9 @@ export function activate(context: ExtensionContext) {
 	});
 
 	let defocusSelectionCommand = commands.registerCommand('extension.defocusSelection' , () => {
-		console.info('Removing range from focus');
+		if (!window.activeTextEditor) { return false; }
+		let defocusPos: Position = window.activeTextEditor.selection.anchor;
+		removeRangeFromFocus(defocusPos);
 	});
 
 	context.subscriptions.push(focusSelectionCommand);
@@ -139,7 +142,13 @@ function addRangeToFocus(range: Range) {
 }
 
 function removeRangeFromFocus(position: Position) {
-
+	for (let rangeIndex in rangesInFocus) {
+		if (rangesInFocus[rangeIndex].contains(position)) {
+			delete rangesInFocus[rangeIndex];
+			setDecorationRanges();
+			applyDecorations();
+		}
+	}
 }
 
 

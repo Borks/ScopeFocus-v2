@@ -37,7 +37,7 @@
 			{
 				"command": "extension.defocusSelection",
 				"title": "Remove focus",
-				"when": "extension.isFocused && !editorHasSelection"
+				"when": "!editorHasSelection"
 			}
 		],
 		"menus": {
@@ -48,7 +48,7 @@
 				},
 				{
 					"command": "extension.defocusSelection",
-					"when": "extension.isFocused && !editorHasSelection"
+					"when": "!editorHasSelection"
 				}
 			]
 		},
