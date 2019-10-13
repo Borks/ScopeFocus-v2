@@ -31,12 +31,12 @@
 			},
 			{
 				"command": "extension.focusSelection",
-				"title": "Focus selection",
+				"title": "Focus Selection",
 				"when": "editorHasSelection"
 			},
 			{
 				"command": "extension.defocusSelection",
-				"title": "Defocus selection",
+				"title": "Defocus Selection",
 				"when": "!editorHasSelection"
 			},
 			{

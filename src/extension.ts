@@ -139,12 +139,27 @@ function addRangeToFocus(range: Range): void | boolean {
 	if (!window.activeTextEditor) { return false; }
 
 	/**
-	 * Check to see if range can be merged with another
+	 * Check to see if range can be merged or is more specific
 	 */
-	for (let existingFocus in rangesInFocus) {
-		if (rangesInFocus[existingFocus].intersection(range)) {
-			let combinedRange: Range = rangesInFocus[existingFocus].union(range);
-			delete rangesInFocus[existingFocus];
+	for (let index in rangesInFocus) {
+
+		/**
+		 * If an existing focused area encompasses the new range, then the new range is
+		 * more specific. Therefore focus only on that
+		 */
+		if (rangesInFocus[index].contains(range)) {
+			delete rangesInFocus[index];
+			rangesInFocus.push(range);
+
+			return;
+		}
+
+		/**
+		 * If the new range intersects with an existing range, combine them.
+		 */
+		if (rangesInFocus[index].intersection(range)) {
+			let combinedRange: Range = rangesInFocus[index].union(range);
+			delete rangesInFocus[index];
 			rangesInFocus.push(combinedRange);
 
 			return;
