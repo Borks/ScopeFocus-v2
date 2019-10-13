@@ -16,27 +16,27 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.focus"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "extension.focus",
-				"title": "ScopeFocus: Activate"
+				"title": "ScopeFocus: Enable"
 			},
 			{
 				"command": "extension.defocus",
-				"title": "ScopeFocus: Deactivate"
+				"title": "ScopeFocus: Disable"
 			},
 			{
 				"command": "extension.focusSelection",
-				"title": "Focus this",
+				"title": "Focus on this",
 				"when": "editorHasSelection"
 			},
 			{
 				"command": "extension.defocusSelection",
-				"title": "Defocus this",
+				"title": "Remove focus",
 				"when": "extension.isFocused && !editorHasSelection"
 			}
 		],
