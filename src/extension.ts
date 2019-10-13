@@ -2,7 +2,6 @@ import {
 	ExtensionContext,
 	Position,
 	Range,
-	TextEditor,
 	TextEditorDecorationType,
 	commands,
 	window
@@ -33,7 +32,7 @@ var activeDecorations: TextEditorDecorationType[] = [];
 
 
 /**
- * @function activate Activate the extension
+ * @function activate Activate the extension, register the commands
  */
 export function activate(context: ExtensionContext) {
 
@@ -41,10 +40,14 @@ export function activate(context: ExtensionContext) {
 		setDecorationRanges();
 		applyDecorations();
 	});
+	context.subscriptions.push(activateCommand);
+
 
 	let deactivateCommand = commands.registerCommand('extension.defocus', () => {
 		resetDecorations(true);
 	});
+	context.subscriptions.push(deactivateCommand);
+
 
 	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
@@ -54,27 +57,27 @@ export function activate(context: ExtensionContext) {
 		setDecorationRanges();
 		applyDecorations();
 	});
+	context.subscriptions.push(focusSelectionCommand);
+
 
 	let defocusSelectionCommand = commands.registerCommand('extension.defocusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
 		let defocusPos: Range = window.activeTextEditor.selection;
 		removeRangeFromFocus(defocusPos);
 	});
+	context.subscriptions.push(defocusSelectionCommand);
+
 
 	let defocusAllCommand = commands.registerCommand('extension.defocusAll', () => {
 		resetDecorations(true);
 	});
-
-	context.subscriptions.push(focusSelectionCommand);
-	context.subscriptions.push(defocusSelectionCommand);
-	context.subscriptions.push(activateCommand);
-	context.subscriptions.push(deactivateCommand);
 	context.subscriptions.push(defocusAllCommand);
 }
 
 
 /**
- * Calculate and set the out of focus ranges.
+ * @function setDecorationRanges Calculate and set the out of focus ranges.
+ * @returns Array of ranges, which should be decorated as being out of focus
  */
 function setDecorationRanges() : Range[] | boolean {
 	if (!window.activeTextEditor) { return false; }
@@ -83,7 +86,6 @@ function setDecorationRanges() : Range[] | boolean {
 	rangesOutOfFocus = [];
 
 	let offsets = getRangeOffsets();
-	console.table(offsets);
 
 	let posA: Position = new Position(0, 0);
 
@@ -111,7 +113,7 @@ function setDecorationRanges() : Range[] | boolean {
 }
 
 
-function getRangeOffsets() {
+function getRangeOffsets(): number[] {
 	if (!window.activeTextEditor) { return []; }
 
 	let document = window.activeTextEditor.document;
@@ -129,7 +131,11 @@ function getRangeOffsets() {
 }
 
 
-function addRangeToFocus(range: Range) {
+/**
+ * @function addRangeToFocus Add a range to be in focus
+ * @param range Range to be added
+ */
+function addRangeToFocus(range: Range): void | boolean {
 	if (!window.activeTextEditor) { return false; }
 
 	/**
@@ -154,7 +160,7 @@ function addRangeToFocus(range: Range) {
  * @param {Range} range Range to check for intersections with
  * Also reapplies decorations
  */
-function removeRangeFromFocus(range: Range) {
+function removeRangeFromFocus(range: Range): void {
 	for (let rangeIndex in rangesInFocus) {
 		if (rangesInFocus[rangeIndex].intersection(range)) {
 			delete rangesInFocus[rangeIndex];
@@ -168,7 +174,7 @@ function removeRangeFromFocus(range: Range) {
 /**
  * @function applyDecorations Reset the decorations applied to the document
  */
-function applyDecorations() {
+function applyDecorations(): void | boolean {
 	if (!window.activeTextEditor) { return false; }
 
 	resetDecorations();
@@ -179,6 +185,10 @@ function applyDecorations() {
 }
 
 
+/**
+ * @function resetDecorations Remove the applied decorations
+ * @param full [full=false]  Also reset the stored data ranges
+ */
 function resetDecorations(full: Boolean = false) {
 	for (const decoration of activeDecorations) {
 		decoration.dispose();
