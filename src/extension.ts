@@ -155,14 +155,20 @@ function getRangeOffsets(): number[] {
 	if (!window.activeTextEditor) { return []; }
 
 	let document = window.activeTextEditor.document;
-
 	let offsets: number[] = [];
 
+	/**
+	 * Push every in focus ranges anchor offsets to an array
+	 */
 	rangesInFocus.map(range => {
 		offsets.push(document.offsetAt(range.start));
 		offsets.push(document.offsetAt(range.end));
 	});
 
+
+	/**
+	 * Sort offsets in ascending order
+	 */
 	offsets = offsets.sort((a,b) => {return a-b;});
 
 	return offsets;
