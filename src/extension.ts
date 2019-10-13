@@ -11,7 +11,7 @@ import {
 /**
  * Extension configuration
  */
-const EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
+var EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 
 
 /**
@@ -73,6 +73,13 @@ export function activate(context: ExtensionContext) {
 		resetDecorations(true);
 	});
 	context.subscriptions.push(defocusAllCommand);
+
+
+	let configurationWatcher = workspace.onDidChangeConfiguration(() => {
+		EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
+		applyDecorations();
+	});
+	context.subscriptions.push(configurationWatcher);
 }
 
 
@@ -202,10 +209,11 @@ function removeRangeFromFocus(range: Range): void {
  */
 function applyDecorations(): void | boolean {
 	if (!window.activeTextEditor) { return false; }
-	let OUT_OF_FOCUS_DECORATION = { 'opacity': '0.1' };
 
-	let opacity: string | undefined = EXTENSION_CONFIGURATION.get('opacity');
-	if (opacity) { OUT_OF_FOCUS_DECORATION = { 'opacity': opacity }; }
+	let opacity: string = EXTENSION_CONFIGURATION.get('opacity', "0.1");
+	// Stupid workaround to get around unknown type issue.
+	opacity = parseFloat(opacity).toString();
+	let OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
 
 	resetDecorations();
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
@@ -217,16 +225,16 @@ function applyDecorations(): void | boolean {
 
 /**
  * @function resetDecorations Remove the applied decorations
- * @param full [full=false]  Also reset the stored data ranges
+ * @param fullReset [false]  Also reset the stored data ranges
  */
-function resetDecorations(full: Boolean = false) {
+function resetDecorations(fullReset: Boolean = false) {
 	for (const decoration of activeDecorations) {
 		decoration.dispose();
 	}
 
 	activeDecorations = [];
 
-	if (full) {
+	if (fullReset) {
 		rangesInFocus = [];
 		rangesOutOfFocus = [];
 	}

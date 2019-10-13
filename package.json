@@ -64,7 +64,7 @@
 					"type": "string",
 					"description": "What type of focus should be used.",
 					"default": "Line",
-					"enum": ["Line", "Scope"]
+					"enum": ["Line"]
 				},
 				"scopefocus.linePadding": {
 					"type": "number",
@@ -74,7 +74,7 @@
 				},
 				"scopefocus.opacity": {
 					"type": "number",
-					"description": "Opacity for out of focus lines.",
+					"description": "Opacity for out of focus lines. (0 - 1)",
 					"default": 0.1,
 					"minimum": 0,
 					"maximum": 1
