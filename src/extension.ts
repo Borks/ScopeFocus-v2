@@ -58,7 +58,7 @@ export function activate(context: ExtensionContext) {
 
 	let defocusSelectionCommand = commands.registerCommand('extension.defocusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
-		let defocusPos: Position = window.activeTextEditor.selection.anchor;
+		let defocusPos: Range = window.activeTextEditor.selection;
 		removeRangeFromFocus(defocusPos);
 	});
 
@@ -70,6 +70,7 @@ export function activate(context: ExtensionContext) {
 
 
 function setDecorationRanges() {
+
 	if (!window.activeTextEditor) { return false; }
 
 	let editor = window.activeTextEditor.document;
@@ -141,9 +142,9 @@ function addRangeToFocus(range: Range) {
 	rangesInFocus.push(range);
 }
 
-function removeRangeFromFocus(position: Position) {
+function removeRangeFromFocus(position: Range) {
 	for (let rangeIndex in rangesInFocus) {
-		if (rangesInFocus[rangeIndex].contains(position)) {
+		if (rangesInFocus[rangeIndex].intersection(position)) {
 			delete rangesInFocus[rangeIndex];
 			setDecorationRanges();
 			applyDecorations();

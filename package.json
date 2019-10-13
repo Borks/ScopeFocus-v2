@@ -44,11 +44,12 @@
 			"editor/context": [
 				{
 					"when": "editorHasSelection",
-					"command": "extension.focusSelection"
+					"command": "extension.focusSelection",
+					"group": "z_commands"
 				},
 				{
 					"command": "extension.defocusSelection",
-					"when": "!editorHasSelection"
+					"group": "z_commands"
 				}
 			]
 		},
