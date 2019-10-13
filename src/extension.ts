@@ -62,10 +62,15 @@ export function activate(context: ExtensionContext) {
 		removeRangeFromFocus(defocusPos);
 	});
 
+	let defocusAllCommand = commands.registerCommand('extension.defocusAll', () => {
+		resetDecorations(true);
+	});
+
 	context.subscriptions.push(focusSelectionCommand);
 	context.subscriptions.push(defocusSelectionCommand);
 	context.subscriptions.push(activateCommand);
 	context.subscriptions.push(deactivateCommand);
+	context.subscriptions.push(defocusAllCommand);
 }
 
 
@@ -75,6 +80,8 @@ function setDecorationRanges() {
 
 	let editor = window.activeTextEditor.document;
 
+	rangesOutOfFocus = [];
+
 	let offsets = getRangeOffsets();
 	console.table(offsets);
 
@@ -82,13 +89,13 @@ function setDecorationRanges() {
 
 	for (let index = 0; index < offsets.length; index = index + 2) {
 		let posB: Position = editor.positionAt(offsets[index]);
+
 		let outOfFocusRange: Range = new Range(posA, posB);
+		rangesOutOfFocus.push(outOfFocusRange);
 
 		if (index + 1 < offsets.length) {
 			posA = editor.positionAt(offsets[index + 1]);
 		}
-
-		rangesOutOfFocus.push(outOfFocusRange);
 	}
 
 	if (offsets.length > 0) {
@@ -110,8 +117,6 @@ function getRangeOffsets() {
 	let editor = window.activeTextEditor.document;
 
 	let offsets: number[] = [];
-
-	rangesOutOfFocus = [];
 
 	rangesInFocus.map(range => {
 		offsets.push(editor.offsetAt(range.start));
@@ -166,11 +171,17 @@ function applyDecorations() {
 }
 
 
-function resetDecorations() {
+function resetDecorations(full: Boolean = false) {
 	for (const decoration of activeDecorations) {
 		decoration.dispose();
 	}
+
 	activeDecorations = [];
+
+	if (full) {
+		rangesInFocus = [];
+		rangesOutOfFocus = [];
+	}
 }
 
 

@@ -31,13 +31,17 @@
 			},
 			{
 				"command": "extension.focusSelection",
-				"title": "Focus on this",
+				"title": "Focus selection",
 				"when": "editorHasSelection"
 			},
 			{
 				"command": "extension.defocusSelection",
-				"title": "Remove focus",
+				"title": "Defocus selection",
 				"when": "!editorHasSelection"
+			},
+			{
+				"command": "extension.defocusAll",
+				"title": "ScopeFocus: Defocus All"
 			}
 		],
 		"menus": {
