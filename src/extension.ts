@@ -106,7 +106,7 @@ export function activate(context: ExtensionContext) {
 		if (editor !== undefined) {
 			rangesInFocus = getEditorCache(editor.document.uri);
 			setDecorationRanges();
-			applyDecorations(editor.document.uri);
+			applyDecorations(getEditorByUri(editor.document.uri));
 		}
 	});
 	context.subscriptions.push(editorWatcher);
@@ -256,8 +256,8 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
 /**
  * @function applyDecorations Reset the decorations applied to the document
  */
-function applyDecorations(uri: Uri | undefined = undefined): void | boolean {
-	if (!window.activeTextEditor) { return false; }
+function applyDecorations(editor: TextEditor | void = window.activeTextEditor): void | boolean {
+	if (!editor) { return false; }
 
 	let opacity: string = EXTENSION_CONFIGURATION.get('opacity', "0.1");
 	// Stupid workaround to get around unknown type issue.
@@ -267,18 +267,10 @@ function applyDecorations(uri: Uri | undefined = undefined): void | boolean {
 	resetDecorations();
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
 
+	activeDecorations.push(outOfFocus);
 
 	// TODO: better looking code
-	if (uri !== undefined) {
-		let editor = getEditorByUri(uri);
-		if (editor !== undefined) {
-			editor.setDecorations(outOfFocus, rangesOutOfFocus);
-		}
-	} else {
-		window.activeTextEditor.setDecorations(outOfFocus, rangesOutOfFocus);
-	}
-
-	activeDecorations.push(outOfFocus);
+	editor.setDecorations(outOfFocus, rangesOutOfFocus);
 }
 
 

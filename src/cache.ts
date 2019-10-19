@@ -21,9 +21,9 @@ var decorationCache: Array<DecorationStore> = [];
 
 
 export function getEditorCache(uri: Uri): Range[] {
-    for (let decoration in decorationCache) {
-        if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
-            return decorationCache[decoration].rangesInFocus;
+    for (let decoration of decorationCache) {
+        if (decoration.uri.fsPath === uri.fsPath) {
+            return decoration.rangesInFocus;
         }
     }
 
@@ -32,9 +32,9 @@ export function getEditorCache(uri: Uri): Range[] {
 
 
 export function setEditorCache(uri: Uri, ranges: Range[]): void {
-    for (let decoration in decorationCache) {
-        if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
-            decorationCache[decoration].rangesInFocus = ranges;
+    for (let decoration of decorationCache) {
+        if (decoration.uri.fsPath === uri.fsPath) {
+            decoration.rangesInFocus = ranges;
             return;
         }
     }
