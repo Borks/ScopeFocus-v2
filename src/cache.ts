@@ -31,17 +31,17 @@ export function getEditorCache(uri: Uri): Range[] {
 }
 
 
-export function setEditorCache(uri: Uri, ranges: Range[]): void {
+export function setEditorCache(uri: Uri, rangesInFocus: Range[]): void {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
-            decoration.rangesInFocus = ranges;
+            decoration.rangesInFocus = rangesInFocus;
             return;
         }
     }
 
     decorationCache.push({
         uri: uri,
-        rangesInFocus: ranges
+        rangesInFocus: rangesInFocus
     });
 
     return;

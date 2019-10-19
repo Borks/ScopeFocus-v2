@@ -12,7 +12,7 @@ import {
 } from 'vscode';
 import {
 	getEditorCache,
-	removeEditorCache,
+	resetDecorationCache,
 	setEditorCache
 } from './cache';
 
@@ -81,6 +81,7 @@ export function activate(context: ExtensionContext) {
 
 	let defocusAllCommand = commands.registerCommand('extension.defocusAll', () => {
 		resetDecorations(true);
+		resetDecorationCache();
 	});
 	context.subscriptions.push(defocusAllCommand);
 
@@ -259,18 +260,15 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
 function applyDecorations(editor: TextEditor | void = window.activeTextEditor): void | boolean {
 	if (!editor) { return false; }
 
-	let opacity: string = EXTENSION_CONFIGURATION.get('opacity', "0.1");
 	// Stupid workaround to get around unknown type issue.
-	opacity = parseFloat(opacity).toString();
+	let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
 	let OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
 
 	resetDecorations();
+
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
-
-	activeDecorations.push(outOfFocus);
-
-	// TODO: better looking code
 	editor.setDecorations(outOfFocus, rangesOutOfFocus);
+	activeDecorations.push(outOfFocus);
 }
 
 
