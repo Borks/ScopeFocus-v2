@@ -5,10 +5,16 @@ import {
 	TextDocument,
 	TextEditor,
 	TextEditorDecorationType,
+	Uri,
 	commands,
 	window,
 	workspace
 } from 'vscode';
+import {
+	getEditorCache,
+	removeEditorCache,
+	setEditorCache
+} from './cache';
 
 /**
  * Extension configuration
@@ -58,8 +64,7 @@ export function activate(context: ExtensionContext) {
 	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
 
-		let range: Range = window.activeTextEditor.selection;
-		addRangeToFocus(range);
+		addRangeToFocus(window.activeTextEditor.selection);
 		setDecorationRanges();
 		applyDecorations();
 	});
@@ -68,8 +73,8 @@ export function activate(context: ExtensionContext) {
 
 	let defocusSelectionCommand = commands.registerCommand('extension.defocusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
-		let defocusPos: Range = window.activeTextEditor.selection;
-		removeRangeFromFocus(defocusPos);
+
+		removeRangeFromFocus(window.activeTextEditor.selection);
 	});
 	context.subscriptions.push(defocusSelectionCommand);
 
@@ -98,18 +103,14 @@ export function activate(context: ExtensionContext) {
 	 * Reapply correct ranges if active editor changes
 	 */
 	let editorWatcher = window.onDidChangeActiveTextEditor((editor: TextEditor | undefined) => {
-
+		if (editor !== undefined) {
+			rangesInFocus = getEditorCache(editor.document.uri);
+			setDecorationRanges();
+			applyDecorations(editor.document.uri);
+		}
 	});
 	context.subscriptions.push(editorWatcher);
 
-
-	/**
-	 * Clear closed editor from cache
-	 */
-	let closeWatcher = workspace.onDidCloseTextDocument((document: TextDocument) => {
-
-	});
-	context.subscriptions.push(closeWatcher);
 }
 
 
@@ -221,6 +222,7 @@ function addRangeToFocus(range: Range): void | boolean {
 	}
 
 	rangesInFocus.push(range);
+	setEditorCache(window.activeTextEditor.document.uri, rangesInFocus);
 }
 
 
@@ -240,10 +242,21 @@ function removeRangeFromFocus(range: Range): void {
 }
 
 
+function getEditorByUri(uri: Uri): TextEditor | undefined {
+	for (let editor of window.visibleTextEditors) {
+		if (uri.fsPath === editor.document.uri.fsPath) {
+			return editor;
+		}
+	}
+
+	return undefined;
+}
+
+
 /**
  * @function applyDecorations Reset the decorations applied to the document
  */
-function applyDecorations(): void | boolean {
+function applyDecorations(uri: Uri | undefined = undefined): void | boolean {
 	if (!window.activeTextEditor) { return false; }
 
 	let opacity: string = EXTENSION_CONFIGURATION.get('opacity', "0.1");
@@ -253,7 +266,17 @@ function applyDecorations(): void | boolean {
 
 	resetDecorations();
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
-	window.activeTextEditor.setDecorations(outOfFocus, rangesOutOfFocus);
+
+
+	// TODO: better looking code
+	if (uri !== undefined) {
+		let editor = getEditorByUri(uri);
+		if (editor !== undefined) {
+			editor.setDecorations(outOfFocus, rangesOutOfFocus);
+		}
+	} else {
+		window.activeTextEditor.setDecorations(outOfFocus, rangesOutOfFocus);
+	}
 
 	activeDecorations.push(outOfFocus);
 }

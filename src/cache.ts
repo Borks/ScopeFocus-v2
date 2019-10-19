@@ -20,10 +20,10 @@ interface DecorationStore {
 var decorationCache: Array<DecorationStore> = [];
 
 
-export function getEditorDecorations(uri: Uri): Range[] {
-    for (let decoration of decorationCache) {
-        if (decoration.uri === uri) {
-            return decoration.rangesInFocus;
+export function getEditorCache(uri: Uri): Range[] {
+    for (let decoration in decorationCache) {
+        if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
+            return decorationCache[decoration].rangesInFocus;
         }
     }
 
@@ -31,10 +31,10 @@ export function getEditorDecorations(uri: Uri): Range[] {
 }
 
 
-export function setEditorDecorations(uri: Uri, ranges: Range[]): void {
-    for (let decoration of decorationCache) {
-        if (decoration.uri === uri) {
-            decoration.rangesInFocus = ranges;
+export function setEditorCache(uri: Uri, ranges: Range[]): void {
+    for (let decoration in decorationCache) {
+        if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
+            decorationCache[decoration].rangesInFocus = ranges;
             return;
         }
     }
@@ -43,12 +43,14 @@ export function setEditorDecorations(uri: Uri, ranges: Range[]): void {
         uri: uri,
         rangesInFocus: ranges
     });
+
+    return;
 }
 
 
-export function removeEditorDecorations(uri: Uri) {
+export function removeEditorCache(uri: Uri) {
     for (let decoration in decorationCache) {
-        if (decorationCache[decoration].uri === uri) {
+        if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
             delete decorationCache[decoration];
             return true;
         }
@@ -58,7 +60,7 @@ export function removeEditorDecorations(uri: Uri) {
 
 export function hasEditorDecorations (uri: Uri): Boolean {
     for (let decoration of decorationCache) {
-        if (decoration.uri === uri) {
+        if (decoration.uri.fsPath === uri.fsPath) {
             return true;
         }
     }
