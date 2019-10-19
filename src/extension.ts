@@ -2,6 +2,7 @@ import {
 	ExtensionContext,
 	Position,
 	Range,
+	TextDocument,
 	TextEditor,
 	TextEditorDecorationType,
 	commands,
@@ -100,6 +101,15 @@ export function activate(context: ExtensionContext) {
 
 	});
 	context.subscriptions.push(editorWatcher);
+
+
+	/**
+	 * Clear closed editor from cache
+	 */
+	let closeWatcher = workspace.onDidCloseTextDocument((document: TextDocument) => {
+
+	});
+	context.subscriptions.push(closeWatcher);
 }
 
 
