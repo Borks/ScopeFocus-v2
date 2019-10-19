@@ -20,16 +20,53 @@ interface DecorationStore {
 var decorationCache: Array<DecorationStore> = [];
 
 
-export function getEditorDecorations(uri: Uri) {
+export function getEditorDecorations(uri: Uri): Range[] {
+    for (let decoration of decorationCache) {
+        if (decoration.uri === uri) {
+            return decoration.rangesInFocus;
+        }
+    }
 
+    return [];
 }
 
 
-export function setEditorDecorations(uri: Uri) {
+export function setEditorDecorations(uri: Uri, ranges: Range[]): void {
+    for (let decoration of decorationCache) {
+        if (decoration.uri === uri) {
+            decoration.rangesInFocus = ranges;
+            return;
+        }
+    }
 
+    decorationCache.push({
+        uri: uri,
+        rangesInFocus: ranges
+    });
 }
 
 
-export function hasEditorDecorations (uri: Uri) {
+export function removeEditorDecorations(uri: Uri) {
+    for (let decoration in decorationCache) {
+        if (decorationCache[decoration].uri === uri) {
+            delete decorationCache[decoration];
+            return true;
+        }
+    }
+}
 
+
+export function hasEditorDecorations (uri: Uri): Boolean {
+    for (let decoration of decorationCache) {
+        if (decoration.uri === uri) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+export function resetDecorationCache() {
+    decorationCache = [];
 }
