@@ -49,11 +49,11 @@
 				{
 					"when": "editorHasSelection",
 					"command": "extension.focusSelection",
-					"group": "z_commands"
+					"group": "1_modification"
 				},
 				{
 					"command": "extension.defocusSelection",
-					"group": "z_commands"
+					"group": "1_modification"
 				}
 			]
 		},
