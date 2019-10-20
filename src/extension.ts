@@ -2,9 +2,9 @@ import {
 	ExtensionContext,
 	Position,
 	Range,
-	TextDocument,
 	TextEditor,
 	TextEditorDecorationType,
+	TextEditorSelectionChangeEvent,
 	Uri,
 	commands,
 	window,
@@ -112,6 +112,11 @@ export function activate(context: ExtensionContext) {
 	});
 	context.subscriptions.push(editorWatcher);
 
+
+	let selectionWatcher = window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
+
+	});
+	context.subscriptions.push(selectionWatcher);
 }
 
 

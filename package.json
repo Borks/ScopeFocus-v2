@@ -41,7 +41,7 @@
 			},
 			{
 				"command": "extension.defocusAll",
-				"title": "ScopeFocus: Unfocus All"
+				"title": "Unfocus All"
 			}
 		],
 		"menus": {
@@ -53,6 +53,10 @@
 				},
 				{
 					"command": "extension.defocusSelection",
+					"group": "1_modification"
+				},
+				{
+					"command": "extension.defocusAll",
 					"group": "1_modification"
 				}
 			]
