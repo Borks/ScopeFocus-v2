@@ -9,7 +9,7 @@ Color themes are supposed to help but in my opinion in long files they just make
 
 `alt+f` - Toggle focus
 
-`alt+x` - Remove focus from selection or from selection
+`alt+x` - Remove focus from selection or from under cursor
 
 `alt+backspace` - Remove focus from all places
 

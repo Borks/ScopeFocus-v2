@@ -8,7 +8,7 @@ import {
  * @property {Uri} uri the URI of the document
  * @property {Range[]} rangesInFocus Array of in focus ranges
  */
-interface DecorationStore {
+interface EditorCacheType {
 	uri: Uri;
     rangesInFocus: Range[];
     rangesOutOfFocus: Range[];
@@ -18,10 +18,13 @@ interface DecorationStore {
 /**
  * Cache to store active decorations when editor changes
  */
-var decorationCache: Array<DecorationStore> = [];
+var decorationCache: Array<EditorCacheType> = [];
 
 
-export function getEditorCache(uri: Uri): DecorationStore | null {
+/**
+ * Get the decoration cache for a single editor by uri
+ */
+export function getEditorCache(uri: Uri): EditorCacheType | null {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
             return decoration;
@@ -32,6 +35,9 @@ export function getEditorCache(uri: Uri): DecorationStore | null {
 }
 
 
+/**
+ * Set the cache for an editor by uri
+ */
 export function setEditorCache(uri: Uri, rangesInFocus: Range[], rangesOutOfFocus: Range[]): void {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
@@ -51,6 +57,9 @@ export function setEditorCache(uri: Uri, rangesInFocus: Range[], rangesOutOfFocu
 }
 
 
+/**
+ * Remove an editor cache by Uri
+ */
 export function removeEditorCache(uri: Uri) {
     for (let decoration in decorationCache) {
         if (decorationCache[decoration].uri.fsPath === uri.fsPath) {
@@ -61,6 +70,9 @@ export function removeEditorCache(uri: Uri) {
 }
 
 
+/**
+ * Does an editor have an active cache
+ */
 export function hasEditorDecorations (uri: Uri): Boolean {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
@@ -72,6 +84,9 @@ export function hasEditorDecorations (uri: Uri): Boolean {
 }
 
 
+/**
+ * Reset the entire cache
+ */
 export function resetDecorationCache() {
     decorationCache = [];
 }

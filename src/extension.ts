@@ -257,6 +257,19 @@ function addRangeToFocus(range: Range): void | boolean {
 
 			return;
 		}
+
+	}
+
+	/**
+	 * If the new range is a single character, then focus on the line
+	 */
+	if (range.start.compareTo(range.end) === 0) {
+		let lineRange: Range = window.activeTextEditor.document.lineAt(range.end.line).range;
+		rangesInFocus.push(lineRange);
+		setDecorationRanges();
+		setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
+
+		return;
 	}
 
 	rangesInFocus.push(range);
