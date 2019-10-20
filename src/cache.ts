@@ -10,7 +10,8 @@ import {
  */
 interface DecorationStore {
 	uri: Uri;
-	rangesInFocus: Range[];
+    rangesInFocus: Range[];
+    rangesOutOfFocus: Range[];
 }
 
 
@@ -20,28 +21,30 @@ interface DecorationStore {
 var decorationCache: Array<DecorationStore> = [];
 
 
-export function getEditorCache(uri: Uri): Range[] {
+export function getEditorCache(uri: Uri): DecorationStore | null {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
-            return decoration.rangesInFocus;
+            return decoration;
         }
     }
 
-    return [];
+    return null;
 }
 
 
-export function setEditorCache(uri: Uri, rangesInFocus: Range[]): void {
+export function setEditorCache(uri: Uri, rangesInFocus: Range[], rangesOutOfFocus: Range[]): void {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
             decoration.rangesInFocus = rangesInFocus;
+            decoration.rangesOutOfFocus = rangesOutOfFocus;
             return;
         }
     }
 
     decorationCache.push({
         uri: uri,
-        rangesInFocus: rangesInFocus
+        rangesInFocus: rangesInFocus,
+        rangesOutOfFocus: rangesOutOfFocus
     });
 
     return;

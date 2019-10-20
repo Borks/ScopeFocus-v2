@@ -127,9 +127,15 @@ export function activate(context: ExtensionContext) {
 	 */
 	let editorWatcher = window.onDidChangeActiveTextEditor((editor: TextEditor | undefined) => {
 		if (editor !== undefined) {
-			rangesInFocus = getEditorCache(editor.document.uri);
-			setDecorationRanges();
-			applyDecorations(getEditorByUri(editor.document.uri));
+			let documentUri = editor.document.uri;
+			let editorCache = getEditorCache(documentUri);
+
+			if (editorCache) {
+				console.log('cache loaded', editorCache.rangesOutOfFocus);
+				rangesInFocus = editorCache.rangesInFocus;
+				rangesOutOfFocus = editorCache.rangesOutOfFocus;
+				applyDecorations(getEditorByUri(documentUri));
+			}
 		}
 	});
 	context.subscriptions.push(editorWatcher);
@@ -233,6 +239,8 @@ function addRangeToFocus(range: Range): void | boolean {
 		if (rangesInFocus[index].contains(range)) {
 			delete rangesInFocus[index];
 			rangesInFocus.push(range);
+			setDecorationRanges();
+			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 
 			return;
 		}
@@ -244,13 +252,16 @@ function addRangeToFocus(range: Range): void | boolean {
 			let combinedRange: Range = rangesInFocus[index].union(range);
 			delete rangesInFocus[index];
 			rangesInFocus.push(combinedRange);
+			setDecorationRanges();
+			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 
 			return;
 		}
 	}
 
 	rangesInFocus.push(range);
-	setEditorCache(window.activeTextEditor.document.uri, rangesInFocus);
+	setDecorationRanges();
+	setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 }
 
 
@@ -284,8 +295,9 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
 /**
  * @function applyDecorations Reset the decorations applied to the document
  */
-function applyDecorations(editor: TextEditor | undefined = window.activeTextEditor): void | boolean {
-	if (editor === undefined || !focusEnabled) { return false; }
+function applyDecorations(editor: TextEditor | undefined = window.activeTextEditor): void {
+	console.log(rangesOutOfFocus);
+	if (editor === undefined || !focusEnabled) { return; }
 
 	// Stupid workaround to get around unknown type issue.
 	let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
