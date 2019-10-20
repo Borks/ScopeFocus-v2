@@ -45,15 +45,15 @@
 				{
 					"when": "editorHasSelection",
 					"command": "extension.focusSelection",
-					"group": "1_modification"
+					"group": "1_scopeFocus@1"
 				},
 				{
 					"command": "extension.defocusSelection",
-					"group": "1_modification"
+					"group": "1_scopeFocus@2"
 				},
 				{
 					"command": "extension.defocusAll",
-					"group": "1_modification"
+					"group": "1_scopeFocus@3"
 				}
 			]
 		},
