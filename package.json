@@ -22,12 +22,8 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.focus",
-				"title": "ScopeFocus: Enable"
-			},
-			{
-				"command": "extension.defocus",
-				"title": "ScopeFocus: Disable"
+				"command": "extension.toggle",
+				"title": "ScopeFocus: Toggle focus"
 			},
 			{
 				"command": "extension.focusSelection",

@@ -23,6 +23,12 @@ var EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 
 
 /**
+ * Should focus currently be enabled
+ */
+var focusEnabled: Boolean = true;
+
+
+/**
  * Ranges that should be in focus
  */
 var rangesInFocus: Range[] = [];
@@ -49,6 +55,7 @@ export function activate(context: ExtensionContext) {
 	/*                                  COMMANDS                                  */
 	/* -------------------------------------------------------------------------- */
 	let activateCommand = commands.registerCommand('extension.focus', () => {
+		focusEnabled = true;
 		setDecorationRanges();
 		applyDecorations();
 	});
@@ -56,14 +63,28 @@ export function activate(context: ExtensionContext) {
 
 
 	let deactivateCommand = commands.registerCommand('extension.defocus', () => {
+		focusEnabled = false;
 		resetDecorations();
 	});
 	context.subscriptions.push(deactivateCommand);
 
 
+	let toggleCommand = commands.registerTextEditorCommand('extension.toggle', () => {
+		focusEnabled = !focusEnabled;
+
+		if (!focusEnabled) {
+			resetDecorations();
+		} else {
+			setDecorationRanges();
+			applyDecorations();
+		}
+	});
+	context.subscriptions.push(toggleCommand);
+
 	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
 
+		focusEnabled = true;
 		addRangeToFocus(window.activeTextEditor.selection);
 		setDecorationRanges();
 		applyDecorations();
@@ -262,8 +283,8 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
 /**
  * @function applyDecorations Reset the decorations applied to the document
  */
-function applyDecorations(editor: TextEditor | void = window.activeTextEditor): void | boolean {
-	if (!editor) { return false; }
+function applyDecorations(editor: TextEditor | undefined = window.activeTextEditor): void | boolean {
+	if (editor === undefined || !focusEnabled) { return false; }
 
 	// Stupid workaround to get around unknown type issue.
 	let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
