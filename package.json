@@ -83,30 +83,20 @@
 		},
 		"keybindings": [
 			{
-				"command": "extension.focus",
-				"key": "ctrl+alt+s",
-				"mac": "ctrl+alt+s"
-			},
-			{
 				"command": "extension.focusSelection",
-				"key": "ctrl+alt+d",
-				"mac": "ctrl+alt+d",
-				"when": "editorHasSelection"
+				"key": "alt+d"
 			},
 			{
-				"command": "extension.defocus",
-				"key": "ctrl+alt+f",
-				"mac": "ctrl+alt+f"
+				"command": "extension.toggle",
+				"key": "alt+f"
 			},
 			{
 				"command": "extension.defocusSelection",
-				"key": "ctrl+alt+x",
-				"mac": "ctrl+alt+x"
+				"key": "alt+x"
 			},
 			{
 				"command": "extension.defocusAll",
-				"key": "ctrl+alt+backspace",
-				"mac": "ctrl+alt+backspace"
+				"key": "alt+backspace"
 			}
 		]
 	},

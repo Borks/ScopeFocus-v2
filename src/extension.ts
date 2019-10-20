@@ -81,6 +81,7 @@ export function activate(context: ExtensionContext) {
 	});
 	context.subscriptions.push(toggleCommand);
 
+
 	let focusSelectionCommand = commands.registerCommand('extension.focusSelection' , () => {
 		if (!window.activeTextEditor) { return false; }
 

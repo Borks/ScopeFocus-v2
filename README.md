@@ -5,15 +5,13 @@ Color themes are supposed to help but in my opinion in long files they just make
 
 ## Features
 
-`ctrl+alt+s` - Enable focused areas
+`alt+d` - Focus on selection
 
-`ctrl+alt+d` - Add focus to selection
+`alt+f` - Toggle focus
 
-`ctrl+alt+f` - Disable focused areas
+`alt+x` - Remove focus from selection or from selection
 
-`ctrl+alt+x` - Remove focus from location under text cursor
-
-`ctrl+alt+backspace` - Remove focus from all places
+`alt+backspace` - Remove focus from all places
 
 ## Settings
 
