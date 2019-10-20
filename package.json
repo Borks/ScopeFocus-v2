@@ -23,7 +23,7 @@
 		"commands": [
 			{
 				"command": "extension.toggle",
-				"title": "ScopeFocus: Toggle focus"
+				"title": "Toggle Focus View"
 			},
 			{
 				"command": "extension.focusSelection",
@@ -54,6 +54,10 @@
 				{
 					"command": "extension.defocusAll",
 					"group": "1_scopeFocus@3"
+				},
+				{
+					"command": "extension.toggle",
+					"group": "1_scopeFocus@4"
 				}
 			]
 		},
