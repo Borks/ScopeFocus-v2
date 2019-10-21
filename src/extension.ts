@@ -155,6 +155,9 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(editorWatcher);
 
 
+	/**
+	 * Focus follows cursor mode.
+	 */
 	let selectionWatcher = window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
 
 	});
@@ -247,6 +250,26 @@ function addRangeToFocus(range: Range): void | boolean {
 	for (let index in rangesInFocus) {
 
 		/**
+		 * If the range is equal to an existing range,
+		 * then focus the full lines
+		 * - Acts as a double click feature to quickly select and focus on area without
+		 * measuring full lines.
+		 */
+		if (rangesInFocus[index].isEqual(range)) {
+			delete rangesInFocus[index];
+			let newRange: Range = new Range(
+				new Position(range.start.line, 0),
+				window.activeTextEditor.document.lineAt(range.end.line).range.end
+			);
+
+			rangesInFocus.push(newRange);
+			setDecorationRanges();
+			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
+
+			return;
+		}
+
+		/**
 		 * If an existing focused area encompasses the new range, then the new range is
 		 * more specific. Therefore focus only on that
 		 */
@@ -286,6 +309,10 @@ function addRangeToFocus(range: Range): void | boolean {
 		return;
 	}
 
+
+	/**
+	 * Just a new range to focus on
+	 */
 	rangesInFocus.push(range);
 	setDecorationRanges();
 	setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
@@ -356,6 +383,6 @@ function resetDecorations(fullReset: Boolean = false) {
 
 
 export function deactivate() {
-	resetDecorations();
+	resetDecorations(true);
 }
 
