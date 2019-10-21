@@ -303,6 +303,10 @@ function removeRangeFromFocus(range: Range): void {
 			delete rangesInFocus[rangeIndex];
 			setDecorationRanges();
 			applyDecorations();
+
+			if (window.activeTextEditor) {
+				setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
+			}
 		}
 	}
 }
