@@ -47,6 +47,14 @@ var activeDecorations: TextEditorDecorationType[] = [];
 
 
 /**
+ * initialize Decoration opacity value from settings
+ * Includes weird workaround to get around unknown type issue when loading string from conf.
+ */
+let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
+var OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
+
+
+/**
  * @function activate Activate the extension, register the commands
  */
 export function activate(context: ExtensionContext) {
@@ -116,7 +124,16 @@ export function activate(context: ExtensionContext) {
 	 * Reload configuration if it changes
 	 */
 	let configurationWatcher = workspace.onDidChangeConfiguration(() => {
+		// Load new configuration
 		EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
+
+
+		// Stupid workaround to get around unknown type issue.
+		// Recreate decoration struct
+		opacity = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
+		OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
+
+		// Reapply new decorations
 		applyDecorations();
 	});
 	context.subscriptions.push(configurationWatcher);
@@ -126,17 +143,14 @@ export function activate(context: ExtensionContext) {
 	 * Reapply correct ranges if active editor changes
 	 */
 	let editorWatcher = window.onDidChangeActiveTextEditor((editor: TextEditor | undefined) => {
-		if (editor !== undefined) {
-			let documentUri = editor.document.uri;
-			let editorCache = getEditorCache(documentUri);
+		if (editor === undefined) { return; }
 
-			if (editorCache) {
-				console.log('cache loaded', editorCache.rangesOutOfFocus);
-				rangesInFocus = editorCache.rangesInFocus;
-				rangesOutOfFocus = editorCache.rangesOutOfFocus;
-				applyDecorations(getEditorByUri(documentUri));
-			}
-		}
+		let documentUri = editor.document.uri;
+		let editorCache = getEditorCache(documentUri);
+
+		rangesInFocus = editorCache.rangesInFocus;
+		rangesOutOfFocus = editorCache.rangesOutOfFocus;
+		applyDecorations(getEditorByUri(documentUri));
 	});
 	context.subscriptions.push(editorWatcher);
 
@@ -309,17 +323,12 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
  * @function applyDecorations Reset the decorations applied to the document
  */
 function applyDecorations(editor: TextEditor | undefined = window.activeTextEditor): void {
-	console.log(rangesOutOfFocus);
 	if (editor === undefined || !focusEnabled) { return; }
-
-	// Stupid workaround to get around unknown type issue.
-	let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
-	let OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
-
-	resetDecorations();
 
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
 	editor.setDecorations(outOfFocus, rangesOutOfFocus);
+
+	resetDecorations();
 	activeDecorations.push(outOfFocus);
 }
 
