@@ -50,7 +50,7 @@ var activeDecorations: TextEditorDecorationType[] = [];
  * initialize Decoration opacity value from settings
  * Includes weird workaround to get around unknown type issue when loading string from conf.
  */
-let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
+let opacity: string = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.06")).toString();
 var OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
 
 
@@ -130,7 +130,7 @@ export function activate(context: ExtensionContext) {
 
 		// Stupid workaround to get around unknown type issue.
 		// Recreate decoration struct
-		opacity = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.1")).toString();
+		opacity = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.06")).toString();
 		OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
 
 		// Reapply new decorations

@@ -78,7 +78,7 @@
 				"scopefocus.opacity": {
 					"type": "number",
 					"description": "Opacity for out of focus lines. (0 - 1)",
-					"default": 0.1,
+					"default": 0.06,
 					"minimum": 0,
 					"maximum": 1
 				}
