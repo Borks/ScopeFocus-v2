@@ -24,14 +24,14 @@ var decorationCache: Array<EditorCacheType> = [];
 /**
  * Get the decoration cache for a single editor by uri
  */
-export function getEditorCache(uri: Uri): EditorCacheType | null {
+export function getEditorCache(uri: Uri): EditorCacheType {
     for (let decoration of decorationCache) {
         if (decoration.uri.fsPath === uri.fsPath) {
             return decoration;
         }
     }
 
-    return null;
+    return { uri: uri, rangesInFocus: [], rangesOutOfFocus: [] };
 }
 
 
