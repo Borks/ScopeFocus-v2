@@ -87,19 +87,23 @@
 		"keybindings": [
 			{
 				"command": "extension.focusSelection",
-				"key": "alt+d"
+				"key": "alt+d",
+				"mac": "ctrl+d"
 			},
 			{
 				"command": "extension.toggle",
-				"key": "alt+f"
+				"key": "alt+f",
+				"mac": "ctrl+f"
 			},
 			{
 				"command": "extension.defocusSelection",
-				"key": "alt+x"
+				"key": "alt+x",
+				"mac": "ctrl+x"
 			},
 			{
 				"command": "extension.defocusAll",
-				"key": "alt+backspace"
+				"key": "alt+backspace",
+				"mac": "ctrl+"
 			}
 		]
 	},
