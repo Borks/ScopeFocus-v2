@@ -274,10 +274,10 @@ function getRangeOffsets(): number[] {
 	});
 
 	// Add ranges from cursor range
-	if (cursorFocusRange) {
-		offsets.push(document.offsetAt(cursorFocusRange.start));
-		offsets.push(document.offsetAt(cursorFocusRange.end));
-	}
+	// if (cursorFocusRange) {
+	// 	offsets.push(document.offsetAt(cursorFocusRange.start));
+	// 	offsets.push(document.offsetAt(cursorFocusRange.end));
+	// }
 
 	/**
 	 * Sort offsets in ascending order
@@ -292,8 +292,8 @@ function getRangeOffsets(): number[] {
  * @function addRangeToFocus Add a range to be in focus
  * @param range Range to be added
  */
-function addRangeToFocus(range: Range): void | boolean {
-	if (!window.activeTextEditor) { return false; }
+function addRangeToFocus(range: Range): void {
+	if (!window.activeTextEditor) { return; }
 
 	/**
 	 * Check to see if range can be merged or is more specific
@@ -308,42 +308,32 @@ function addRangeToFocus(range: Range): void | boolean {
 		 */
 		if (rangesInFocus[index].isEqual(range)) {
 			delete rangesInFocus[index];
-			let newRange: Range = new Range(
+			range = new Range(
 				new Position(range.start.line, 0),
 				window.activeTextEditor.document.lineAt(range.end.line).range.end
 			);
 
-			rangesInFocus.push(newRange);
-			setDecorationRanges();
-			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
-
-			return;
+			continue;
 		}
 
 		/**
-		 * If an existing focused area encompasses the new range, then the new range is
-		 * more specific. Therefore focus only on that
+		 * If an existing focused area encompasses the new range or the other way around,
+		 * then the new range is more specific. Therefore focus only on that
 		 */
 		if (rangesInFocus[index].contains(range) || range.contains(rangesInFocus[index])) {
 			delete rangesInFocus[index];
-			rangesInFocus.push(range);
-			setDecorationRanges();
-			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 
-			return;
+			continue;
 		}
 
 		/**
 		 * If the new range intersects with an existing range, combine them.
 		 */
 		if (rangesInFocus[index].intersection(range)) {
-			let combinedRange: Range = rangesInFocus[index].union(range);
+			range = rangesInFocus[index].union(range);
 			delete rangesInFocus[index];
-			rangesInFocus.push(combinedRange);
-			setDecorationRanges();
-			setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 
-			return;
+			continue;
 		}
 
 	}
@@ -352,17 +342,12 @@ function addRangeToFocus(range: Range): void | boolean {
 	 * If the new range is a single character, then focus on the line
 	 */
 	if (range.start.compareTo(range.end) === 0) {
-		let lineRange: Range = window.activeTextEditor.document.lineAt(range.end.line).range;
-		rangesInFocus.push(lineRange);
-		setDecorationRanges();
-		setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
-
-		return;
+		range = window.activeTextEditor.document.lineAt(range.end.line).range;
 	}
 
 
 	/**
-	 * Just a new range to focus on
+	 * Apply the new range
 	 */
 	rangesInFocus.push(range);
 	setDecorationRanges();
