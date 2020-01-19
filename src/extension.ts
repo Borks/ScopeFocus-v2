@@ -162,7 +162,7 @@ export function activate(context: ExtensionContext) {
 
 
 	/**
-	 * Focus follows cursor mode.
+	 * Focus type functionality
 	 */
 	let selectionWatcher = window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
 		if (!window.activeTextEditor) { return; }
@@ -171,47 +171,86 @@ export function activate(context: ExtensionContext) {
 		// Should support more in the future but for now good enough
 		if (event.selections.length !== 1) { return; }
 
-		let cursorRange: Range = event.selections[0];
-		let document = window.activeTextEditor.document;
-
-		// Check that the cursor is not in an already focused area
-		for (let range of rangesInFocus) {
-			if (range.contains(cursorRange)) {
-				cursorFocusRange = new Range(0,0,0,0);
-				setDecorationRanges();
-				applyDecorations();
-				return;
-			}
+		// Set focus depending on setting of focusType
+		let focusType: string = EXTENSION_CONFIGURATION.get('focusType', 'soft');
+		switch (focusType) {
+			case 'padded':
+				setCursorFocusRange(event.selections[0]);
+				break;
+			case 'soft':
+				checkSoftModeCursorPosition(event.selections[0]);
+				break;
+			case 'hard':
+				break;
 		}
 
-		// If it is an actual selection (not cursor position), dont use padding
-		let padding: number = EXTENSION_CONFIGURATION.get('linePadding', 0);
-		if (!cursorRange.start.isEqual(cursorRange.end)) { padding = 0; }
-
-		// Create ranges
-		let newRange: Range  = new Range(
-			new Position(cursorRange.start.line - padding, 0),
-			document.lineAt(cursorRange.end.line + padding).range.end
-		);
-
-		// Check for intersections with existing focused areas
-		for (let rangeInFocus of rangesInFocus) {
-			if (rangeInFocus.intersection(newRange)) {
-				// new Range should be the combination of 2
-				if (cursorRange.start.isBefore(rangeInFocus.start)) {
-					newRange = new Range(newRange.start, rangeInFocus.start);
-				} else if (cursorRange.end.isAfter(rangeInFocus.end)) {
-					newRange = new Range(rangeInFocus.end, newRange.end);
-				}
-			}
-		}
-
-		// Apply
-		cursorFocusRange = newRange;
-		setDecorationRanges();
-		applyDecorations();
 	});
 	context.subscriptions.push(selectionWatcher);
+}
+
+/**
+ * @function checkSoftModeCursorPosition
+ * Enable or disable focus mode depending on cursor position and selection
+ *
+ */
+function checkSoftModeCursorPosition(cursorRange: Range): void {
+	// Check that the cursor is not in an already focused area
+	let cursorInFocus: boolean = false;
+
+	for (let range of rangesInFocus) {
+		if (range.contains(cursorRange)) {
+			cursorInFocus = true;
+		}
+	}
+}
+
+
+/**
+ * @function setCursorFocusRange
+ * In case of padded focus type apply cursor focus range
+ * @param {Range} cursorRange cursor position
+ * @returns {void}
+ */
+function setCursorFocusRange(cursorRange: Range): void {
+	if (!window.activeTextEditor) { return; }
+	let document = window.activeTextEditor.document;
+
+	// Check that the cursor is not in an already focused area
+	for (let range of rangesInFocus) {
+		if (range.contains(cursorRange)) {
+			cursorFocusRange = new Range(0,0,0,0);
+			setDecorationRanges();
+			applyDecorations();
+			return;
+		}
+	}
+
+	// If it is an actual selection (not cursor position), dont use padding
+	let padding: number = EXTENSION_CONFIGURATION.get('linePadding', 0);
+	if (!cursorRange.start.isEqual(cursorRange.end)) { padding = 0; }
+
+	// Create ranges
+	let newRange: Range  = new Range(
+		new Position(cursorRange.start.line - padding, 0),
+		document.lineAt(cursorRange.end.line + padding).range.end
+	);
+
+	// Check for intersections with existing focused areas
+	for (let rangeInFocus of rangesInFocus) {
+		if (rangeInFocus.intersection(newRange)) {
+			// new Range should be the combination of 2
+			if (cursorRange.start.isBefore(rangeInFocus.start)) {
+				newRange = new Range(newRange.start, rangeInFocus.start);
+			} else if (cursorRange.end.isAfter(rangeInFocus.end)) {
+				newRange = new Range(rangeInFocus.end, newRange.end);
+			}
+		}
+	}
+
+	// Apply
+	cursorFocusRange = newRange;
+	setDecorationRanges();
+	applyDecorations();
 }
 
 
