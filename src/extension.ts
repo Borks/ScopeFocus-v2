@@ -25,7 +25,12 @@ var EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 /**
  * Should focus currently be enabled
  */
-var focusEnabled: Boolean = true;
+var focusEnabled: Boolean = false;
+
+/**
+ * Is focus enabled in soft mode
+ */
+var softFocus: Boolean = true;
 
 
 /**
@@ -133,13 +138,14 @@ export function activate(context: ExtensionContext) {
 		// Load new configuration
 		EXTENSION_CONFIGURATION = workspace.getConfiguration('scopefocus');
 
-
 		// Stupid workaround to get around unknown type issue.
 		// Recreate decoration struct
 		opacity = parseFloat(EXTENSION_CONFIGURATION.get('opacity', "0.06")).toString();
 		OUT_OF_FOCUS_DECORATION = { 'opacity': opacity };
 
 		// Reapply new decorations
+		cursorFocusRange = new Range(0,0,0,0);
+		setDecorationRanges();
 		applyDecorations();
 	});
 	context.subscriptions.push(configurationWatcher);
@@ -175,12 +181,14 @@ export function activate(context: ExtensionContext) {
 		let focusType: string = EXTENSION_CONFIGURATION.get('focusType', 'soft');
 		switch (focusType) {
 			case 'padded':
+				softFocus = true;
 				setCursorFocusRange(event.selections[0]);
 				break;
 			case 'soft':
 				checkSoftModeCursorPosition(event.selections[0]);
 				break;
 			case 'hard':
+				softFocus = true;
 				break;
 		}
 
@@ -202,6 +210,11 @@ function checkSoftModeCursorPosition(cursorRange: Range): void {
 			cursorInFocus = true;
 		}
 	}
+
+	softFocus = cursorInFocus ? true : false;
+	resetDecorations();
+	setDecorationRanges();
+	applyDecorations();
 }
 
 
@@ -437,7 +450,7 @@ function getEditorByUri(uri: Uri): TextEditor | undefined {
  * @function applyDecorations Reset the decorations applied to the document
  */
 function applyDecorations(editor: TextEditor | undefined = window.activeTextEditor): void {
-	if (editor === undefined || !focusEnabled) { return; }
+	if (editor === undefined || !focusEnabled || !softFocus) { return; }
 
 	const outOfFocus: TextEditorDecorationType = window.createTextEditorDecorationType(OUT_OF_FOCUS_DECORATION);
 	editor.setDecorations(outOfFocus, rangesOutOfFocus);
