@@ -2,7 +2,7 @@
 	"name": "scopefocus",
 	"displayName": "ScopeFocus",
 	"description": "Focus only on a part of your code",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "BorkaCodes",
 	"icon": "logo.png",
 	"repository": {
