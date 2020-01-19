@@ -65,13 +65,17 @@
 			"properties": {
 				"scopefocus.focusType": {
 					"type": "string",
-					"description": "What type of focus should be used.",
-					"default": "Line",
-					"enum": ["Line"]
+					"default": "soft",
+					"enum": ["padded", "soft", "hard"],
+					"enumDescriptions": [
+						"Focus follows cursor with padded lines.",
+						"Unfocus if cursor goes outside focused area.",
+						"Focus only selected ranges."
+					]
 				},
 				"scopefocus.linePadding": {
 					"type": "number",
-					"description": "How many extra lines should be in focus for line mode.",
+					"description": "How many extra lines should be in focus for soft mode.",
 					"default": 0,
 					"minimum": 0
 				},
