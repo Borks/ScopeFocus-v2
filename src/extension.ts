@@ -169,36 +169,40 @@ export function activate(context: ExtensionContext) {
 
 		// Check that there is only one selection.
 		// Should support more in the future but for now good enough
-		if (event.selections.length > 1) {
-			cursorFocusRange = new Range(0,0,0,0);
-			setDecorationRanges();
-			applyDecorations();
-			return;
-		}
+		if (event.selections.length !== 1) { return; }
 
 		let cursorRange: Range = event.selections[0];
 		let document = window.activeTextEditor.document;
 
-		// Set the range with padding from settings
-		let padding: number = EXTENSION_CONFIGURATION.get('linePadding', 0);
-		// If it is an actual selection (not cursor position), dont use padding
-		if (!cursorRange.start.isEqual(cursorRange.end)) { padding = 0; }
-		let newRange: Range  = new Range(
-			new Position(cursorRange.start.line - padding, 0),
-			document.lineAt(cursorRange.end.line + padding).range.end
-		);
-		let newRangeNoPaddings: Range = new Range(
-			new Position(cursorRange.start.line, 0),
-			document.lineAt(cursorRange.end.line).range.end
-		);
-
-		// Check that the selection isnt in an existing range in focus.
-		for (let rangeInFocus of rangesInFocus) {
-			if(newRangeNoPaddings.intersection(rangeInFocus)) {
+		// Check that the cursor is not in an already focused area
+		for (let range of rangesInFocus) {
+			if (range.contains(cursorRange)) {
 				cursorFocusRange = new Range(0,0,0,0);
 				setDecorationRanges();
 				applyDecorations();
 				return;
+			}
+		}
+
+		// If it is an actual selection (not cursor position), dont use padding
+		let padding: number = EXTENSION_CONFIGURATION.get('linePadding', 0);
+		if (!cursorRange.start.isEqual(cursorRange.end)) { padding = 0; }
+
+		// Create ranges
+		let newRange: Range  = new Range(
+			new Position(cursorRange.start.line - padding, 0),
+			document.lineAt(cursorRange.end.line + padding).range.end
+		);
+
+		// Check for intersections with existing focused areas
+		for (let rangeInFocus of rangesInFocus) {
+			if (rangeInFocus.intersection(newRange)) {
+				// new Range should be the combination of 2
+				if (cursorRange.start.isBefore(rangeInFocus.start)) {
+					newRange = new Range(newRange.start, rangeInFocus.start);
+				} else if (cursorRange.end.isAfter(rangeInFocus.end)) {
+					newRange = new Range(rangeInFocus.end, newRange.end);
+				}
 			}
 		}
 
@@ -274,10 +278,10 @@ function getRangeOffsets(): number[] {
 	});
 
 	// Add ranges from cursor range
-	// if (cursorFocusRange) {
-	// 	offsets.push(document.offsetAt(cursorFocusRange.start));
-	// 	offsets.push(document.offsetAt(cursorFocusRange.end));
-	// }
+	if (cursorFocusRange) {
+		offsets.push(document.offsetAt(cursorFocusRange.start));
+		offsets.push(document.offsetAt(cursorFocusRange.end));
+	}
 
 	/**
 	 * Sort offsets in ascending order
@@ -298,7 +302,9 @@ function addRangeToFocus(range: Range): void {
 	/**
 	 * Check to see if range can be merged or is more specific
 	 */
-	for (let index in rangesInFocus) {
+	rangesInFocus = rangesInFocus.filter((rangeInFocus, index) => {
+		let removeRange: Boolean = false;
+		if (!window.activeTextEditor) { return; }
 
 		/**
 		 * If the range is equal to an existing range,
@@ -306,37 +312,36 @@ function addRangeToFocus(range: Range): void {
 		 * - Acts as a double click feature to quickly select and focus on area without
 		 * measuring full lines.
 		 */
-		if (rangesInFocus[index].isEqual(range)) {
-			delete rangesInFocus[index];
+		if (rangeInFocus.isEqual(range)) {
+			removeRange = true;
 			range = new Range(
 				new Position(range.start.line, 0),
 				window.activeTextEditor.document.lineAt(range.end.line).range.end
 			);
-
-			continue;
 		}
 
 		/**
 		 * If an existing focused area encompasses the new range or the other way around,
 		 * then the new range is more specific. Therefore focus only on that
 		 */
-		if (rangesInFocus[index].contains(range) || range.contains(rangesInFocus[index])) {
-			delete rangesInFocus[index];
+		if (rangeInFocus.contains(range) || range.contains(rangeInFocus)) {
+			removeRange = true;
 
-			continue;
+			// .intersection() also returns true in case of contains
+			// so return early here.
+			return !removeRange;
 		}
 
 		/**
 		 * If the new range intersects with an existing range, combine them.
 		 */
 		if (rangesInFocus[index].intersection(range)) {
-			range = rangesInFocus[index].union(range);
-			delete rangesInFocus[index];
-
-			continue;
+			range = rangeInFocus.union(range);
+			removeRange = true;
 		}
 
-	}
+		return !removeRange;
+	});
 
 	/**
 	 * If the new range is a single character, then focus on the line
@@ -345,11 +350,14 @@ function addRangeToFocus(range: Range): void {
 		range = window.activeTextEditor.document.lineAt(range.end.line).range;
 	}
 
+	// Reset the cursor range so that offsets get calculated correctly.
+	cursorFocusRange = new Range(0,0,0,0);
 
 	/**
 	 * Apply the new range
 	 */
 	rangesInFocus.push(range);
+
 	setDecorationRanges();
 	setEditorCache(window.activeTextEditor.document.uri, rangesInFocus, rangesOutOfFocus);
 }
