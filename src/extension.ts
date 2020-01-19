@@ -35,6 +35,12 @@ var rangesInFocus: Range[] = [];
 
 
 /**
+ * Range that follow the cursor
+ */
+var cursorFocusRange: Range;
+
+
+/**
  * Ranges that are out of focus
  */
 var rangesOutOfFocus: Range[] = [];
@@ -159,7 +165,47 @@ export function activate(context: ExtensionContext) {
 	 * Focus follows cursor mode.
 	 */
 	let selectionWatcher = window.onDidChangeTextEditorSelection((event: TextEditorSelectionChangeEvent) => {
+		if (!window.activeTextEditor) { return; }
 
+		// Check that there is only one selection.
+		// Should support more in the future but for now good enough
+		if (event.selections.length > 1) {
+			cursorFocusRange = new Range(0,0,0,0);
+			setDecorationRanges();
+			applyDecorations();
+			return;
+		}
+
+		let cursorRange: Range = event.selections[0];
+		let document = window.activeTextEditor.document;
+
+		// Set the range with padding from settings
+		let padding: number = EXTENSION_CONFIGURATION.get('linePadding', 0);
+		// If it is an actual selection (not cursor position), dont use padding
+		if (!cursorRange.start.isEqual(cursorRange.end)) { padding = 0; }
+		let newRange: Range  = new Range(
+			new Position(cursorRange.start.line - padding, 0),
+			document.lineAt(cursorRange.end.line + padding).range.end
+		);
+		let newRangeNoPaddings: Range = new Range(
+			new Position(cursorRange.start.line, 0),
+			document.lineAt(cursorRange.end.line).range.end
+		);
+
+		// Check that the selection isnt in an existing range in focus.
+		for (let rangeInFocus of rangesInFocus) {
+			if(newRangeNoPaddings.intersection(rangeInFocus)) {
+				cursorFocusRange = new Range(0,0,0,0);
+				setDecorationRanges();
+				applyDecorations();
+				return;
+			}
+		}
+
+		// Apply
+		cursorFocusRange = newRange;
+		setDecorationRanges();
+		applyDecorations();
 	});
 	context.subscriptions.push(selectionWatcher);
 }
@@ -227,6 +273,11 @@ function getRangeOffsets(): number[] {
 		offsets.push(document.offsetAt(range.end));
 	});
 
+	// Add ranges from cursor range
+	if (cursorFocusRange) {
+		offsets.push(document.offsetAt(cursorFocusRange.start));
+		offsets.push(document.offsetAt(cursorFocusRange.end));
+	}
 
 	/**
 	 * Sort offsets in ascending order
@@ -273,7 +324,7 @@ function addRangeToFocus(range: Range): void | boolean {
 		 * If an existing focused area encompasses the new range, then the new range is
 		 * more specific. Therefore focus only on that
 		 */
-		if (rangesInFocus[index].contains(range)) {
+		if (rangesInFocus[index].contains(range) || range.contains(rangesInFocus[index])) {
 			delete rangesInFocus[index];
 			rangesInFocus.push(range);
 			setDecorationRanges();
