@@ -19,8 +19,8 @@ Color themes are supposed to help but in my opinion in long files they just make
 
 `scopefocus.opacity` - Visibility of out of focus areas.
 
-`scopefocus.padding` - _Not yet implemented_ How many lines should be focused extra when following cursor
+`scopefocus.padding` -  How many lines should be focused extra when following cursor
 
-`scopefocus.focusType` - _Not yet implemented_ Line- and Scopemode.
+`scopefocus.focusType` - Soft, hard, padding mode.
 
 `scopefocus.roundLines` - _Not yet implemented_ If focusing should by default round up to full lines
