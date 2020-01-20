@@ -75,6 +75,7 @@ export function activate(context: ExtensionContext) {
 	/* -------------------------------------------------------------------------- */
 	let activateCommand = commands.registerCommand('extension.focus', () => {
 		focusEnabled = true;
+		softFocus = true;
 		setDecorationRanges();
 		applyDecorations();
 	});
@@ -105,6 +106,7 @@ export function activate(context: ExtensionContext) {
 		if (!window.activeTextEditor) { return false; }
 
 		focusEnabled = true;
+		softFocus = true;
 		addRangeToFocus(window.activeTextEditor.selection);
 		setDecorationRanges();
 		applyDecorations();
@@ -212,6 +214,7 @@ function checkSoftModeCursorPosition(cursorRange: Range): void {
 	}
 
 	softFocus = cursorInFocus ? true : false;
+	console.log('setting softmode to', softFocus);
 	resetDecorations();
 	setDecorationRanges();
 	applyDecorations();
